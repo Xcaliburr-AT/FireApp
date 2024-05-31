@@ -16,8 +16,9 @@ class Locations(BaseModel):
     longitude = models.DecimalField(
         max_digits=22, decimal_places=16, null=True, blank=True)
     address = models.CharField(max_length=150)
-    city = models.CharField(max_length=150) 
-    country = models.CharField(max_length=150) 
+    city = models.CharField(max_length=150)  # can be in separate table
+    country = models.CharField(max_length=150)  # can be in separate table
+
 
 class Incident(BaseModel):
     SEVERITY_CHOICES = (
@@ -49,7 +50,7 @@ class FireStation(BaseModel):
 
 
 class Firefighters(BaseModel):
-    EXP_CHOICES = (
+    XP_CHOICES = (
         ('Probationary Firefighter', 'Probationary Firefighter'),
         ('Firefighter I', 'Firefighter I'),
         ('Firefighter II', 'Firefighter II'),
@@ -58,10 +59,9 @@ class Firefighters(BaseModel):
         ('Captain', 'Captain'),
         ('Battalion Chief', 'Battalion Chief'),)
     name = models.CharField(max_length=150)
-    rank = models.CharField(max_length=150, choices=EXP_CHOICES)
+    rank = models.CharField(max_length=150, choices=XP_CHOICES)
     experience_level = models.CharField(max_length=150)
     station = models.ForeignKey(FireStation, on_delete=models.CASCADE)
-
 
 
 class FireTruck(BaseModel):
