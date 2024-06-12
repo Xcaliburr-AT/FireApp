@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="content">
+  <div class="page-inner">
+    <h4 class="page-title">Firefighters</h4>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">List of Firefighters</div>
+          </div>
+          <br />
+          <div class="col-md-12 row">
+            <div class="col-md-6">
+              <form class="navbar-left navbar-form nav-search mr-md-3" action="{% url 'firefighter-list' %}">
+                <div class="input-group">
+                  <input type="text" placeholder="Search ..." class="form-control" name="q"/>
+                  <div class="input-group-append">
+                    <span class="input-group-text">
+                      <i class="la la-search search-icon"></i>
+                    </span>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="col-md-6">
+              <div class="pull-right">
+                <a href="{% url 'firefighter-add' %}" class="btn btn-success btn-rounded">Add Firefighter</a>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <table class="table table-striped mt-3">
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Rank</th>
+                  <th scope="col">Experience Level</th>
+                  <th scope="col">Station</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for firefighter in firefighters %}
+                <tr id="firefighter-{{ firefighter.id }}">
+                  <td>{{ firefighter.name }}</td>
+                  <td>{{ firefighter.rank }}</td>
+                  <td>{{ firefighter.experience_level }}</td>
+                  <td>{{ firefighter.station.name }}</td>
+                  <td>
+                    <a href="{% url 'firefighter-edit' firefighter.id %}">Edit</a>
+                    <a href="#" class="text-danger" onclick="confirmDelete('{{ firefighter.id }}')">Delete</a>
+                    <form id="delete-form-{{ firefighter.id }}" action="{% url 'firefighter-delete' firefighter.id %}" method="POST" style="display: none;">
+                      {% csrf_token %}
+                    </form>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5" style="text-align: center">
+                    <p class="text-sm font-weight-bold mb-0">No Records Found</p>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% include 'includes/pagination.html' %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal" tabindex="-1" role="dialog" id="deleteModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Deletion</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this firefighter?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteButton">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Undo Notification -->
+<div class="alert alert-warning alert-dismissible fade show" role="alert" id="undoAlert" style="display: none;">
+  Firefighter deleted. <button type="button" class="btn btn-link" id="undoButton">Undo</button>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<script type="text/javascript">
+  var deleteId = null;
+  var deleteTimeout = null;
+
+  function confirmDelete(id) {
+    deleteId = id;
+    $('#deleteModal').modal('show');
+  }
+
+  document.getElementById('confirmDeleteButton').addEventListener('click', function() {
+    if (deleteId) {
+      var form = document.getElementById('delete-form-' + deleteId);
+      var row = document.getElementById('firefighter-' + deleteId);
+
+      // Temporarily hide the row and show undo alert
+      row.style.display = 'none';
+      $('#deleteModal').modal('hide');
+      $('#undoAlert').show();
+
+      // Set a timeout to delete the record after 10 seconds if not undone
+      deleteTimeout = setTimeout(function() {
+        fetch(form.action, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then(response => {
+          if (response.ok) {
+            row.remove();
+          } else {
+            alert('Failed to delete the firefighter.');
+            row.style.display = '';
+          }
+          $('#undoAlert').hide();
+        }).catch(error => {
+          alert('Failed to delete the firefighter.');
+          row.style.display = '';
+          $('#undoAlert').hide();
+        });
+      }, 10000);
+    }
+  });
+
+  document.getElementById('undoButton').addEventListener('click', function() {
+    clearTimeout(deleteTimeout);
+    var row = document.getElementById('firefighter-' + deleteId);
+    row.style.display = '';
+    $('#undoAlert').hide();
+  });
+</script>
+{% endblock %}
