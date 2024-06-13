@@ -1,32 +1,31 @@
 {% extends 'base.html' %}
-{% load static %}
 {% block content %}
 <div class="content">
   <div class="page-inner">
-    <h4 class="page-title">Firefighters</h4>
+    <h4 class="page-title">Fire Trucks</h4>
     <div class="row">
       <div class="col-md-12">
         <div class="card">
           <div class="card-header">
-            <div class="card-title">List of Firefighters</div>
+            <div class="card-title">List of Fire Trucks</div>
           </div>
           <br />
           <div class="col-md-12 row">
             <div class="col-md-6">
-              <form class="navbar-left navbar-form nav-search mr-md-3" action="{% url 'firefighter-list' %}">
+              <form class="navbar-left navbar-form nav-search mr-md-3" action="{% url 'firetruck-list' %}">
                 <div class="input-group">
-                  <input type="text" placeholder="Search ..." class="form-control" name="q"/>
+                  <input type="text" placeholder="Search ..." class="form-control" name="q" value="{{ request.GET.q }}">
                   <div class="input-group-append">
-                    <span class="input-group-text">
+                    <button type="submit" class="input-group-text">
                       <i class="la la-search search-icon"></i>
-                    </span>
+                    </button>
                   </div>
                 </div>
               </form>
             </div>
             <div class="col-md-6">
               <div class="pull-right">
-                <a href="{% url 'firefighter-add' %}" class="btn btn-success btn-rounded">Add Firefighter</a>
+                <a href="{% url 'firetruck-add' %}" class="btn btn-success btn-rounded">Add Fire Truck</a>
               </div>
             </div>
           </div>
@@ -34,24 +33,24 @@
             <table class="table table-striped mt-3">
               <thead>
                 <tr>
-                  <th scope="col">Name</th>
-                  <th scope="col">Rank</th>
-                  <th scope="col">Experience Level</th>
+                  <th scope="col">Truck Number</th>
+                  <th scope="col">Model</th>
+                  <th scope="col">Capacity</th>
                   <th scope="col">Station</th>
                   <th scope="col">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {% for firefighter in firefighters %}
-                <tr id="firefighter-{{ firefighter.id }}">
-                  <td>{{ firefighter.name }}</td>
-                  <td>{{ firefighter.rank }}</td>
-                  <td>{{ firefighter.experience_level }}</td>
-                  <td>{{ firefighter.station.name }}</td>
+                {% for firetruck in firetrucks %}
+                <tr id="firetruck-{{ firetruck.id }}">
+                  <td>{{ firetruck.truck_number }}</td>
+                  <td>{{ firetruck.model }}</td>
+                  <td>{{ firetruck.capacity }}</td>
+                  <td>{{ firetruck.station.name }}</td>
                   <td>
-                    <a href="{% url 'firefighter-edit' firefighter.id %}" class="btn btn-sm btn-info">Edit</a>
-                    <a href="#" class="btn btn-sm btn-danger" onclick="confirmDelete('{{ firefighter.id }}')">Delete</a>
-                    <form id="delete-form-{{ firefighter.id }}" action="{% url 'firefighter-delete' firefighter.id %}" method="POST" style="display: none;">
+                    <a href="{% url 'firetruck-edit' firetruck.id %}" class="btn btn-sm btn-info">Edit</a>
+                    <a href="#" class="btn btn-sm btn-danger" onclick="confirmDelete('{{ firetruck.id }}')">Delete</a>
+                    <form id="delete-form-{{ firetruck.id }}" action="{% url 'firetruck-delete' firetruck.id %}" method="POST" style="display: none;">
                       {% csrf_token %}
                     </form>
                   </td>
@@ -84,7 +83,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <p>Are you sure you want to delete this firefighter?</p>
+        <p>Are you sure you want to delete this fire truck?</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -104,8 +103,7 @@
   document.getElementById('confirmDeleteButton').addEventListener('click', function() {
     if (deleteId) {
       var form = document.getElementById('delete-form-' + deleteId);
-      var row = document.getElementById('firefighter-' + deleteId);
-
+      var row = document.getElementById('firetruck-' + deleteId);
       fetch(form.action, {
         method: 'POST',
         headers: {
@@ -116,11 +114,11 @@
         if (response.ok) {
           row.remove();
         } else {
-          alert('Failed to delete the firefighter.');
+          alert('Failed to delete the fire truck.');
         }
         $('#deleteModal').modal('hide');
       }).catch(error => {
-        alert('Failed to delete the firefighter.');
+        alert('Failed to delete the fire truck.');
         $('#deleteModal').modal('hide');
       });
     }

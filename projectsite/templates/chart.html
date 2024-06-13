@@ -17,14 +17,29 @@
         .chart-box {
             width: 90%;
             margin: 20px auto;
+            border: 2px solid blue;
+            padding: 10px;
+            border-radius: 10px;
             max-width: 800px;
             height: 500px;
+        }
+        .card-header {
+            background-color: #f7f7f7;
+            border-bottom: 1px solid #e3e3e3;
+            padding: 10px 15px;
+        }
+        .card-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Charts</h1>
+        <div class="card-header">
+            <div class="card-title">Charts</div>
+        </div>
         <div class="chart-container">
             <!-- Pie Chart -->
             <div class="chart-box">
@@ -147,6 +162,7 @@
                             labels: {
                                 padding: 10,
                                 fontColor: "#1d7af3",
+                                fontSize: 14,
                             },
                         },
                         tooltips: {
@@ -196,6 +212,7 @@
                             labels: {
                                 padding: 10,
                                 fontColor: "#1d7af3",
+                                fontSize: 14,
                             },
                         },
                         tooltips: {
