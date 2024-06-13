@@ -3,7 +3,7 @@
 {% block content %}
 <div class="content">
   <div class="page-inner">
-    <h4 class="page-title">Incident</h4>
+    <h4 class="page-title">fire Station</h4>
     <div class="row">
       <div class="col-md-12">
         <div class="card">
@@ -49,8 +49,8 @@
                   <td>{{ object.city }}</td>
                   <td>{{ object.country }}</td>
                   <td>
-                    <a href="firestation_list/{{object.id}}">Edit</a>
-                    <a href="#" class="text-danger" onclick="confirmDelete('{{ object.id }}')">Delete</a>
+                    <a href="firestation_list/{{object.id}}" class="btn btn-sm btn-info">Edit</a>
+                    <a href="#" class="btn btn-sm btn-danger" onclick="confirmDelete('{{ object.id }}')">Delete</a>
                     <form id="delete-form-{{ object.id }}" action="{% url 'firestation-delete' object.id %}" method="POST" style="display: none;">
                       {% csrf_token %}
                     </form>

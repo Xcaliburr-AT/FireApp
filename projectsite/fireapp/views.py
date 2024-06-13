@@ -1,10 +1,10 @@
 from django.forms import CharField
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic.list import ListView
-from fireapp.models import Locations, Incident, FireStation, Firefighters
+from fireapp.models import Locations, Incident, FireStation, Firefighters, FireTruck
 
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from fireapp.forms import IncidentForm, FireStationForm, FirefighterForm
+from fireapp.forms import IncidentForm, FireStationForm, FirefighterForm, FireTruckForm
 
 from django.urls import reverse_lazy
 
@@ -19,6 +19,11 @@ import calendar
 
 from django.db.models import Count
 from datetime import datetime
+
+#from .mock_weather import generate_mock_weather
+import random
+
+
 
 
 class HomePageView(ListView):
@@ -259,3 +264,69 @@ class FirefighterDeleteView(DeleteView):
         self.object = self.get_object()
         self.object.delete()
         return JsonResponse({'status': 'ok'})
+    
+
+class FireTruckListView(ListView):
+    model = FireTruck
+    context_object_name = 'firetrucks'
+    template_name = 'firetruck/firetruck_list.html'
+    paginate_by = 10
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super(FireTruckListView, self).get_queryset(*args, **kwargs)
+        if self.request.GET.get("q") is not None:
+            query = self.request.GET.get('q')
+            qs = qs.filter(
+                Q(truck_number__icontains=query) |
+                Q(model__icontains=query) |
+                Q(capacity__icontains=query) |
+                Q(station__name__icontains=query)
+            )
+        return qs
+
+class FireTruckCreateView(CreateView):
+    model = FireTruck
+    form_class = FireTruckForm
+    template_name = 'firetruck/firetruck_add.html'
+    success_url = reverse_lazy('firetruck-list')
+
+class FireTruckUpdateView(UpdateView):
+    model = FireTruck
+    form_class = FireTruckForm
+    template_name = 'firetruck/firetruck_edit.html'
+    success_url = reverse_lazy('firetruck-list')
+
+class FireTruckDeleteView(DeleteView):
+    model = FireTruck
+    template_name = 'firetruck/firetruck_del.html'
+    success_url = reverse_lazy('firetruck-list')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        return JsonResponse({'status': 'ok'})
+    
+
+def generate_mock_weather():
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    descriptions = ["Sunny", "Cloudy", "Rainy", "Stormy"]
+    weather_data = []
+
+    for day in days:
+        weather_data.append({
+            "day": day,
+            "temperature": random.randint(10, 30),
+            "description": random.choice(descriptions)
+        })
+    
+    return weather_data
+
+def dashboard(request):
+    city_name = "Puerto Princesa City"
+    weather_data = generate_mock_weather()
+
+    context = {
+        "city_name": city_name,
+        "weather_data": weather_data
+    }
+    return render(request, 'home.html', context)
